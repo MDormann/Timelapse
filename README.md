@@ -34,6 +34,25 @@ Zeile einfügen (täglich um 07:00 Uhr):
 0 7 * * * cd /pfad/zum/repo && python snapshot.py >> /var/log/reolink_snapshot.log 2>&1
 ```
 
+### Mit Docker (empfohlen)
+
+Das Image wird automatisch bei jedem Push auf `main` gebaut und unter
+`ghcr.io/mdormann/timelapse:latest` veröffentlicht.
+
+```bash
+# Einmaliger Test
+docker run --rm \
+  -v /pfad/zur/config.ini:/app/config.ini:ro \
+  -v /mnt/qnap/timelapse:/mnt/qnap/timelapse \
+  ghcr.io/mdormann/timelapse:latest
+```
+
+Cron mit Docker (täglich 07:00):
+
+```
+0 7 * * * docker run --rm -v /pfad/zur/config.ini:/app/config.ini:ro -v /mnt/qnap/timelapse:/mnt/qnap/timelapse ghcr.io/mdormann/timelapse:latest >> /var/log/reolink_snapshot.log 2>&1
+```
+
 ## Dateistruktur auf dem NAS
 
 ```
