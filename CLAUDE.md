@@ -9,14 +9,23 @@ Single-file Python utility that fetches a snapshot from a Reolink camera via its
 ## Commands
 
 ```bash
-# Install dependencies
+# Install runtime dependencies
 pip install -r requirements.txt
+
+# Install dev dependencies (includes pytest + pytest-mock)
+pip install -r requirements-dev.txt
 
 # Copy and configure before first run
 cp config.example.ini config.ini
 
 # Run the snapshot (requires config.ini and a reachable camera + NAS)
 python snapshot.py
+
+# Run the full test suite (no real camera or NAS needed — all I/O is mocked)
+pytest
+
+# Run a single test file or test class
+pytest tests/test_snapshot.py::TestFetchSnapshot
 
 # Build Docker image locally
 docker build -t timelapse .
@@ -28,7 +37,17 @@ docker run --rm \
   ghcr.io/mdormann/timelapse:latest
 ```
 
-There is no test suite. Manual testing is done by running `python snapshot.py` directly.
+## Tests
+
+The test suite lives in `tests/test_snapshot.py` (32 tests, ~320 lines) and uses `pytest` + `pytest-mock`. All external I/O is mocked — no real camera or NAS required. Tests are grouped by function:
+
+- `TestLoadConfig` — file-found/missing paths, section parsing, fallback defaults
+- `TestRandomRs` — length, character set, uniqueness
+- `TestFetchSnapshot` — happy path, URL construction, HTTP errors, wrong `Content-Type` (bad credentials), timeout, connection errors
+- `TestSaveSnapshot` — directory creation, filename format, data integrity, idempotent mkdir
+- `TestMain` — NAS-missing exit, happy-path orchestration, config fallbacks, exception propagation
+
+`requirements-dev.txt` extends `requirements.txt` and adds `pytest>=8.0` and `pytest-mock>=3.14`.
 
 ## Architecture
 
