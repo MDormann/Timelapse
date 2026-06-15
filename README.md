@@ -1,59 +1,59 @@
 # Timelapse
 
-Täglicher Screenshot von einer Reolink-Kamera, gespeichert auf einem QNAP NAS via NFS.
+Daily screenshot from a Reolink camera, saved to a QNAP NAS via NFS.
 
-## Voraussetzungen
+## Requirements
 
 - Python 3.8+
-- NFS-Share bereits gemountet (z.B. unter `/mnt/qnap/timelapse`)
-- Reolink-Kamera im lokalen Netzwerk erreichbar
+- NFS share already mounted (e.g. at `/mnt/qnap/timelapse`)
+- Reolink camera reachable on the local network
 
-## Installation
+## Setup
 
 ```bash
 pip install -r requirements.txt
 cp config.example.ini config.ini
-# config.ini anpassen (Kamera-IP, Zugangsdaten, NAS-Pfad)
+# Edit config.ini: camera IP, credentials, NAS path
 ```
 
-## Einmaliger Test
+## Manual test
 
 ```bash
 python snapshot.py
 ```
 
-## Automatisch jeden Morgen (Cron)
+## Scheduled daily run (Cron)
 
 ```bash
 crontab -e
 ```
 
-Zeile einfügen (täglich um 07:00 Uhr):
+Add this line (runs every day at 07:00):
 
 ```
-0 7 * * * cd /pfad/zum/repo && python snapshot.py >> /var/log/reolink_snapshot.log 2>&1
+0 7 * * * cd /path/to/repo && python snapshot.py >> /var/log/reolink_snapshot.log 2>&1
 ```
 
-### Mit Docker (empfohlen)
+### With Docker (recommended)
 
-Das Image wird automatisch bei jedem Push auf `main` gebaut und unter
-`ghcr.io/mdormann/timelapse:latest` veröffentlicht.
+The image is built automatically on every push to `main` and published at
+`ghcr.io/mdormann/timelapse:latest`.
 
 ```bash
-# Einmaliger Test
+# One-off test
 docker run --rm \
-  -v /pfad/zur/config.ini:/app/config.ini:ro \
+  -v /path/to/config.ini:/app/config.ini:ro \
   -v /mnt/qnap/timelapse:/mnt/qnap/timelapse \
   ghcr.io/mdormann/timelapse:latest
 ```
 
-Cron mit Docker (täglich 07:00):
+Cron with Docker (daily at 07:00):
 
 ```
-0 7 * * * docker run --rm -v /pfad/zur/config.ini:/app/config.ini:ro -v /mnt/qnap/timelapse:/mnt/qnap/timelapse ghcr.io/mdormann/timelapse:latest >> /var/log/reolink_snapshot.log 2>&1
+0 7 * * * docker run --rm -v /path/to/config.ini:/app/config.ini:ro -v /mnt/qnap/timelapse:/mnt/qnap/timelapse ghcr.io/mdormann/timelapse:latest >> /var/log/reolink_snapshot.log 2>&1
 ```
 
-## Dateistruktur auf dem NAS
+## File structure on the NAS
 
 ```
 /mnt/qnap/timelapse/
